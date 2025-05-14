@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TrackFit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title text-muted mb-3">
+                    <i class="fas fa-dumbbell me-2"></i>Total Workouts
+                </h5>
+                <h2 class="display-4 mb-0">{{ total_workouts }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title text-muted mb-3">
+                    <i class="fas fa-calendar-check me-2"></i>Workouts This Month
+                </h5>
+                <h2 class="display-4 mb-0">{{ workouts_last_month }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title text-muted mb-3">
+                    <i class="fas fa-trophy me-2"></i>Personal Records
+                </h5>
+                <h2 class="display-4 mb-0">{{ recent_records|length }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Workouts -->
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Recent Workouts
+                    </h5>
+                    <a href="{{ url_for('workouts.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-2"></i>New Workout
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if recent_workouts %}
+                    <div class="list-group list-group-flush">
+                        {% for workout in recent_workouts %}
+                            <a href="{{ url_for('workouts.view', workout_id=workout.id) }}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ workout.workout_name }}</h6>
+                                    <small class="text-muted">
+                                        {{ workout.workout_date.strftime('%Y-%m-%d') }}
+                                    </small>
+                                </div>
+                                <p class="mb-1 text-muted">
+                                    {% if workout.duration_minutes %}
+                                        <i class="fas fa-clock me-1"></i>{{ workout.duration_minutes }} minutes
+                                    {% endif %}
+                                    {% if workout.exercises %}
+                                        <span class="ms-2">
+                                            <i class="fas fa-dumbbell me-1"></i>{{ workout.exercises|length }} exercises
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center my-4">No workouts logged yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Records & Common Exercises -->
+    <div class="col-md-4">
+        <!-- Recent Records -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-trophy me-2"></i>Recent Records
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_records %}
+                    <div class="list-group list-group-flush">
+                        {% for record in recent_records %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ record.exercise.exercise_name }}</h6>
+                                    <small class="text-muted">
+                                        {{ record.achieved_date.strftime('%Y-%m-%d') }}
+                                    </small>
+                                </div>
+                                <p class="mb-1">
+                                    {{ record.record_value }} 
+                                    {% if record.record_type == 'weight' %}
+                                        kg
+                                    {% elif record.record_type == 'reps' %}
+                                        reps
+                                    {% else %}
+                                        minutes
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center my-4">No records set yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Common Exercises -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Common Exercises
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if common_exercises %}
+                    <div class="list-group list-group-flush">
+                        {% for exercise, count in common_exercises %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ exercise }}</h6>
+                                    <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center my-4">No exercise data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .list-group-item {
+        transition: background-color 0.2s;
+    }
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %} 
